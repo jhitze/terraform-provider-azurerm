@@ -94,6 +94,8 @@ In addition, one of either `identity` or `service_principal` blocks must be spec
 
 * `auto_scaler_profile` - (Optional) A `auto_scaler_profile` block as defined below.
 
+* `azure_active_directory_role_based_access_control` - (Optional) - A `azure_active_directory_role_based_access_control` block as defined below.
+
 * `disk_encryption_set_id` - (Optional) The ID of the Disk Encryption Set which should be used for the Nodes and Volumes. More information [can be found in the documentation](https://docs.microsoft.com/en-us/azure/aks/azure-disk-customer-managed-keys).
 
 * `http_proxy_config` - (Optional) A `http_proxy_config` block as defined below.
@@ -178,7 +180,11 @@ resource "azurerm_kubernetes_cluster" "example" {
 
 ```
 
+* `role_based_access_control_enabled` (Optional) - Whether Role Based Access Control for the Kubernetes Cluster should be enabled. Defaults to `true`. Changing this forces a new resource to be created.
+
 * `role_based_access_control` - (Optional) A `role_based_access_control` block. Changing this forces a new resource to be created.
+
+~> **NOTE:** The block `role_based_access_control` is deprecated and will be removed in version 3.0 of the AzureRM Provider in favour of the property `role_based_access_control_enabled` and the block `azure_active_directory_role_based_access_control`.
 
 * `service_principal` - (Optional) A `service_principal` block as documented below. One of either `identity` or `service_principal` must be specified. 
 
@@ -282,6 +288,28 @@ An `auto_scaler_profile` block supports the following:
 * `skip_nodes_with_local_storage` - If `true` cluster autoscaler will never delete nodes with pods with local storage, for example, EmptyDir or HostPath. Defaults to `true`.
 
 * `skip_nodes_with_system_pods` - If `true` cluster autoscaler will never delete nodes with pods from kube-system (except for DaemonSet or mirror pods). Defaults to `true`.
+
+---
+
+A `azure_active_directory_role_based_access_control` block supports the following:
+
+* `managed` - (Optional) Is the Azure Active Directory integration Managed, meaning that Azure will create/manage the Service Principal used for integration.
+
+* `tenant_id` - (Optional) The Tenant ID used for Azure Active Directory Application. If this isn't specified the Tenant ID of the current Subscription is used.
+
+When `managed` is set to `true` the following properties can be specified:
+
+* `admin_group_object_ids` - (Optional) A list of Object IDs of Azure Active Directory Groups which should have Admin Role on the Cluster.
+
+* `azure_rbac_enabled` - (Optional) Is Role Based Access Control based on Azure AD enabled?
+
+When `managed` is set to `false` the following properties can be specified:
+
+* `client_app_id` - (Required) The Client ID of an Azure Active Directory Application.
+
+* `server_app_id` - (Required) The Server ID of an Azure Active Directory Application.
+
+* `server_app_secret` - (Required) The Server Secret of an Azure Active Directory Application.
 
 ---
 
